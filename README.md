@@ -106,8 +106,3 @@ This project is open source and available under the [MIT License](LICENSE).
 
 Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/yourusername/your-portfolio/issues).
 
-## 📞 Contact
-
-Oscar Obetta - obetta.oscar11@gmail.com
-
-Project Link: [https://github.com/yourusername/your-portfolio](https://github.com/yourusername/your-portfolio)
