@@ -1,0 +1,22 @@
+[build]
+  publish = "dist"
+  command = "npm run build"
+
+[build.environment]
+  NODE_VERSION = "18"
+
+# Netlify Forms configuration
+[[plugins]]
+  package = "@netlify/plugin-forms"
+
+# Redirect all routes to index.html for SPA routing
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Form handling
+[forms]
+  # Enable form detection
+  [forms.contact]
+    # This will be automatically detected by Netlify
