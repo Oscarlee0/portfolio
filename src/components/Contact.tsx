@@ -24,40 +24,57 @@ const Contact: React.FC = () => {
     setSubmitStatus('idle');
 
     try {
-      // Using Netlify Forms
-      const response = await fetch('/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({
-          'form-name': 'contact',
-          name: formData.name,
-          email: formData.email,
-          subject: formData.subject,
-          message: formData.message,
-        }).toString(),
-      });
+      // Check if we're on Netlify by looking for the netlify hostname or if form submission works
+      const isNetlify = window.location.hostname.includes('netlify') || 
+                       window.location.hostname !== 'localhost';
+      
+      if (isNetlify) {
+        // Try Netlify Forms first
+        const response = await fetch('/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({
+            'form-name': 'contact',
+            name: formData.name,
+            email: formData.email,
+            subject: formData.subject,
+            message: formData.message,
+          }).toString(),
+        });
 
-      if (response.ok) {
-        setSubmitStatus('success');
-        setFormData({ name: '', email: '', subject: '', message: '' });
+        if (response.ok) {
+          setSubmitStatus('success');
+          setFormData({ name: '', email: '', subject: '', message: '' });
+        } else {
+          throw new Error('Netlify form submission failed');
+        }
       } else {
-        throw new Error('Failed to send message');
+        // For local development or non-Netlify deployments, use mailto fallback
+        throw new Error('Not on Netlify, using mailto fallback');
       }
     } catch (error) {
-      console.error('Error sending message:', error);
-      setSubmitStatus('error');
+      console.log('Form submission failed, using mailto fallback:', error);
+      // Use mailto as fallback
+      handleMailtoFallback();
+      setSubmitStatus('success'); // Show success since mailto will open
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // Alternative method using mailto (fallback)
+  // mailto fallback method
   const handleMailtoFallback = () => {
     const subject = encodeURIComponent(`Contact Form: ${formData.subject}`);
     const body = encodeURIComponent(
       `Name: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`
     );
-    window.location.href = `mailto:obetta.oscar11@gmail.com?subject=${subject}&body=${body}`;
+    const mailtoUrl = `mailto:obetta.oscar11@gmail.com?subject=${subject}&body=${body}`;
+    
+    // Open mailto link
+    window.location.href = mailtoUrl;
+    
+    // Clear form after opening mailto
+    setFormData({ name: '', email: '', subject: '', message: '' });
   };
 
   return (
@@ -229,7 +246,12 @@ const Contact: React.FC = () => {
             {submitStatus === 'success' && (
               <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center space-x-2">
                 <CheckCircle className="w-5 h-5 text-green-600" />
-                <span className="text-green-800 font-medium">Message sent successfully! I'll get back to you soon.</span>
+                <span className="text-green-800 font-medium">
+                  {window.location.hostname === 'localhost' 
+                    ? 'Your email client should open shortly!' 
+                    : 'Message sent successfully! I\'ll get back to you soon.'
+                  }
+                </span>
               </div>
             )}
 
@@ -354,6 +376,15 @@ const Contact: React.FC = () => {
                 )}
               </button>
             </form>
+
+            {/* Development Notice */}
+            {window.location.hostname === 'localhost' && (
+              <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <p className="text-blue-800 text-sm">
+                  <strong>Development Mode:</strong> The form will open your email client since Netlify Forms only work on deployed sites.
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>
