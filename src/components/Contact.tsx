@@ -24,12 +24,13 @@ const Contact: React.FC = () => {
     setSubmitStatus('idle');
 
     try {
-      // Check if we're on Netlify by looking for the netlify hostname or if form submission works
-      const isNetlify = window.location.hostname.includes('netlify') || 
-                       window.location.hostname !== 'localhost';
+      // Check if we're on a deployed Netlify site
+      const isNetlifyDeployed = window.location.hostname.includes('netlify.app') || 
+                               window.location.hostname.includes('netlify.com') ||
+                               (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1');
       
-      if (isNetlify) {
-        // Try Netlify Forms first
+      if (isNetlifyDeployed) {
+        // Try Netlify Forms for deployed sites
         const response = await fetch('/', {
           method: 'POST',
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -49,14 +50,15 @@ const Contact: React.FC = () => {
           throw new Error('Netlify form submission failed');
         }
       } else {
-        // For local development or non-Netlify deployments, use mailto fallback
-        throw new Error('Not on Netlify, using mailto fallback');
+        // For local development, use mailto
+        handleMailtoFallback();
+        setSubmitStatus('success');
       }
     } catch (error) {
       console.log('Form submission failed, using mailto fallback:', error);
-      // Use mailto as fallback
+      // Always fall back to mailto if Netlify fails
       handleMailtoFallback();
-      setSubmitStatus('success'); // Show success since mailto will open
+      setSubmitStatus('success');
     } finally {
       setIsSubmitting(false);
     }
@@ -64,14 +66,16 @@ const Contact: React.FC = () => {
 
   // mailto fallback method
   const handleMailtoFallback = () => {
-    const subject = encodeURIComponent(`Contact Form: ${formData.subject}`);
+    const subject = encodeURIComponent(`Portfolio Contact: ${formData.subject}`);
     const body = encodeURIComponent(
-      `Name: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`
+      `Hi Oscar,\n\nI'm reaching out through your portfolio contact form.\n\nName: ${formData.name}\nEmail: ${formData.email}\nSubject: ${formData.subject}\n\nMessage:\n${formData.message}\n\nBest regards,\n${formData.name}`
     );
+    
+    // Use your actual email address
     const mailtoUrl = `mailto:obetta.oscar11@gmail.com?subject=${subject}&body=${body}`;
     
     // Open mailto link
-    window.location.href = mailtoUrl;
+    window.open(mailtoUrl, '_blank');
     
     // Clear form after opening mailto
     setFormData({ name: '', email: '', subject: '', message: '' });
@@ -226,16 +230,24 @@ const Contact: React.FC = () => {
               </div>
             </div>
 
-            {/* Availability */}
+            {/* Contact Information */}
             <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 sm:p-6 shadow-lg border border-gray-200/50">
-              <h4 className="font-semibold text-gray-900 mb-2 text-sm sm:text-base">
-                Current Availability
+              <h4 className="font-semibold text-gray-900 mb-4 text-sm sm:text-base">
+                Direct Contact
               </h4>
-              <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                <span className="text-gray-600 text-sm sm:text-base">
-                  Available for new projects
-                </span>
+              <div className="space-y-3">
+                <div className="flex items-center space-x-3">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <span className="text-gray-600 text-sm sm:text-base">
+                    obetta.oscar11@gmail.com
+                  </span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                  <span className="text-gray-600 text-sm sm:text-base">
+                    Available for new projects
+                  </span>
+                </div>
               </div>
             </div>
           </div>
@@ -247,8 +259,8 @@ const Contact: React.FC = () => {
               <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center space-x-2">
                 <CheckCircle className="w-5 h-5 text-green-600" />
                 <span className="text-green-800 font-medium">
-                  {window.location.hostname === 'localhost' 
-                    ? 'Your email client should open shortly!' 
+                  {window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+                    ? 'Your email client should open with the message!' 
                     : 'Message sent successfully! I\'ll get back to you soon.'
                   }
                 </span>
@@ -271,7 +283,7 @@ const Contact: React.FC = () => {
               </div>
             )}
 
-            {/* Netlify Form - Hidden for JavaScript submission */}
+            {/* Hidden Netlify Form for form detection */}
             <form name="contact" netlify netlify-honeypot="bot-field" hidden>
               <input type="text" name="name" />
               <input type="email" name="email" />
@@ -378,7 +390,7 @@ const Contact: React.FC = () => {
             </form>
 
             {/* Development Notice */}
-            {window.location.hostname === 'localhost' && (
+            {(window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && (
               <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                 <p className="text-blue-800 text-sm">
                   <strong>Development Mode:</strong> The form will open your email client since Netlify Forms only work on deployed sites.
