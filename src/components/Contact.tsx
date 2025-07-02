@@ -24,61 +24,34 @@ const Contact: React.FC = () => {
     setSubmitStatus('idle');
 
     try {
-      // Check if we're on a deployed Netlify site
-      const isNetlifyDeployed = window.location.hostname.includes('netlify.app') || 
-                               window.location.hostname.includes('netlify.com') ||
-                               (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1');
-      
-      if (isNetlifyDeployed) {
-        // Try Netlify Forms for deployed sites
-        const response = await fetch('/', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: new URLSearchParams({
-            'form-name': 'contact',
-            name: formData.name,
-            email: formData.email,
-            subject: formData.subject,
-            message: formData.message,
-          }).toString(),
-        });
+      // Use EmailJS or similar service to send email directly
+      const response = await fetch('https://formspree.io/f/xpwzgqpv', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          subject: formData.subject,
+          message: formData.message,
+          _replyto: formData.email,
+          _subject: `Portfolio Contact: ${formData.subject}`,
+        }),
+      });
 
-        if (response.ok) {
-          setSubmitStatus('success');
-          setFormData({ name: '', email: '', subject: '', message: '' });
-        } else {
-          throw new Error('Netlify form submission failed');
-        }
-      } else {
-        // For local development, use mailto
-        handleMailtoFallback();
+      if (response.ok) {
         setSubmitStatus('success');
+        setFormData({ name: '', email: '', subject: '', message: '' });
+      } else {
+        throw new Error('Failed to send message');
       }
     } catch (error) {
-      console.log('Form submission failed, using mailto fallback:', error);
-      // Always fall back to mailto if Netlify fails
-      handleMailtoFallback();
-      setSubmitStatus('success');
+      console.error('Error sending message:', error);
+      setSubmitStatus('error');
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  // mailto fallback method
-  const handleMailtoFallback = () => {
-    const subject = encodeURIComponent(`Portfolio Contact: ${formData.subject}`);
-    const body = encodeURIComponent(
-      `Hi Oscar,\n\nI'm reaching out through your portfolio contact form.\n\nName: ${formData.name}\nEmail: ${formData.email}\nSubject: ${formData.subject}\n\nMessage:\n${formData.message}\n\nBest regards,\n${formData.name}`
-    );
-    
-    // Use your actual email address
-    const mailtoUrl = `mailto:obetta.oscar11@gmail.com?subject=${subject}&body=${body}`;
-    
-    // Open mailto link
-    window.open(mailtoUrl, '_blank');
-    
-    // Clear form after opening mailto
-    setFormData({ name: '', email: '', subject: '', message: '' });
   };
 
   return (
@@ -258,12 +231,7 @@ const Contact: React.FC = () => {
             {submitStatus === 'success' && (
               <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center space-x-2">
                 <CheckCircle className="w-5 h-5 text-green-600" />
-                <span className="text-green-800 font-medium">
-                  {window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-                    ? 'Your email client should open with the message!' 
-                    : 'Message sent successfully! I\'ll get back to you soon.'
-                  }
-                </span>
+                <span className="text-green-800 font-medium">Message sent successfully! I'll get back to you soon.</span>
               </div>
             )}
 
@@ -274,33 +242,14 @@ const Contact: React.FC = () => {
                   <AlertCircle className="w-5 h-5 text-red-600" />
                   <span className="text-red-800 font-medium">Failed to send message</span>
                 </div>
-                <button
-                  onClick={handleMailtoFallback}
-                  className="text-red-600 hover:text-red-700 underline text-sm"
-                >
-                  Click here to send via your email client instead
-                </button>
+                <p className="text-red-600 text-sm">
+                  Please try again or contact me directly at obetta.oscar11@gmail.com
+                </p>
               </div>
             )}
 
-            {/* Hidden Netlify Form for form detection */}
-            <form name="contact" netlify netlify-honeypot="bot-field" hidden>
-              <input type="text" name="name" />
-              <input type="email" name="email" />
-              <input type="text" name="subject" />
-              <textarea name="message"></textarea>
-            </form>
-
-            {/* Actual Form */}
+            {/* Contact Form */}
             <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
-              {/* Honeypot field for spam protection */}
-              <input type="hidden" name="form-name" value="contact" />
-              <div style={{ display: 'none' }}>
-                <label>
-                  Don't fill this out if you're human: <input name="bot-field" />
-                </label>
-              </div>
-
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
@@ -388,15 +337,6 @@ const Contact: React.FC = () => {
                 )}
               </button>
             </form>
-
-            {/* Development Notice */}
-            {(window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && (
-              <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                <p className="text-blue-800 text-sm">
-                  <strong>Development Mode:</strong> The form will open your email client since Netlify Forms only work on deployed sites.
-                </p>
-              </div>
-            )}
           </div>
         </div>
       </div>
