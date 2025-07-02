@@ -18,30 +18,32 @@ const Contact: React.FC = () => {
     });
   };
 
+  const encode = (data: Record<string, string>) => {
+    return Object.keys(data)
+      .map(key => encodeURIComponent(key) + "=" + encodeURIComponent(data[key]))
+      .join("&");
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitStatus('idle');
 
     try {
-      // Create form data for Netlify
-      const formDataToSend = new FormData();
-      formDataToSend.append('form-name', 'contact');
-      formDataToSend.append('name', formData.name);
-      formDataToSend.append('email', formData.email);
-      formDataToSend.append('subject', formData.subject);
-      formDataToSend.append('message', formData.message);
-
-      const response = await fetch('/', {
-        method: 'POST',
-        body: formDataToSend,
+      const response = await fetch("/", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: encode({
+          "form-name": "contact",
+          ...formData
+        })
       });
 
       if (response.ok) {
         setSubmitStatus('success');
         setFormData({ name: '', email: '', subject: '', message: '' });
       } else {
-        throw new Error('Failed to send message');
+        throw new Error('Network response was not ok');
       }
     } catch (error) {
       console.error('Error sending message:', error);
