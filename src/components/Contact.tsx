@@ -24,8 +24,7 @@ const Contact: React.FC = () => {
     setSubmitStatus('idle');
 
     try {
-      // Use EmailJS or similar service to send email directly
-      const response = await fetch('https://formspree.io/f/xpwzgqpv', {
+      const response = await fetch('https://formspree.io/f/mvgrlegn', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
