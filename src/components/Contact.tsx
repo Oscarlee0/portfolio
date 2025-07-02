@@ -209,24 +209,16 @@ const Contact: React.FC = () => {
               </div>
             </div>
 
-            {/* Contact Information */}
+            {/* Availability */}
             <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 sm:p-6 shadow-lg border border-gray-200/50">
-              <h4 className="font-semibold text-gray-900 mb-4 text-sm sm:text-base">
-                Direct Contact
+              <h4 className="font-semibold text-gray-900 mb-2 text-sm sm:text-base">
+                Current Availability
               </h4>
-              <div className="space-y-3">
-                <div className="flex items-center space-x-3">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span className="text-gray-600 text-sm sm:text-base">
-                    obetta.oscar11@gmail.com
-                  </span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                  <span className="text-gray-600 text-sm sm:text-base">
-                    Available for new projects
-                  </span>
-                </div>
+              <div className="flex items-center space-x-2">
+                <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                <span className="text-gray-600 text-sm sm:text-base">
+                  Available for new projects
+                </span>
               </div>
             </div>
           </div>
