@@ -59,7 +59,7 @@ const Hero: React.FC = () => {
           {/* Social Links */}
           <div className="flex justify-center space-x-4 sm:space-x-6 pt-6 sm:pt-8">
             <a
-              href="https://github.com"
+              href="https://github.com/Oscarlee0"
               target="_blank"
               rel="noopener noreferrer"
               className="p-3 rounded-xl bg-white/80 backdrop-blur-sm shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 hover:bg-purple-50"
