@@ -75,7 +75,7 @@ const Hero: React.FC = () => {
               <Linkedin className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" />
             </a>
             <a
-              href="mailto:alex@example.com"
+              href="mailto:obetta.oscar11@gmail.com"
               className="p-3 rounded-xl bg-white/80 backdrop-blur-sm shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 hover:bg-indigo-50"
             >
               <Mail className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" />
